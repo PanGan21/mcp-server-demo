@@ -26,3 +26,7 @@ A Model Context Protocol (MCP) server implementation that can retieve the latest
     "args": ["main.py"]
   }
   ```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
