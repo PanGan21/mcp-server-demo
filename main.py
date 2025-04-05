@@ -3,13 +3,14 @@ from dotenv import load_dotenv
 import json
 import os
 import httpx
+from bs4 import BeautifulSoup
 
 load_dotenv()
 
 mcp = FastMCP("documentation")
 
 USER_AGENT = "dockes-app/1.0"
-SERVER_URL = "https://google.serper.dev/search"
+SERPER_URL = "https://google.serper.dev/search"
 
 docs_url = {
     "langchain": "python.langchain.com/docs",
@@ -28,15 +29,22 @@ async def search_web(query: str) -> dict | None:
 
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.post(SERVER_URL, headers=headers, data=payload, timeout=30.0)
+            response = await client.post(SERPER_URL, headers=headers, data=payload, timeout=30.0)
             response.raise_for_status()
             return response.json
         except httpx.TimeoutException:
             return {"organic": []}
 
 
-def fetch_url():
-    pass
+async def fetch_url():
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(SERPER_URL, timeout=30.0)
+            soup = BeautifulSoup(response.text, "html.parser")
+            text = soup.get_text()
+            return text
+        except httpx.TimeoutException:
+            return "Timeout error"
 
 
 def get_docs():
