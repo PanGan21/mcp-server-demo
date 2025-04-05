@@ -36,10 +36,10 @@ async def search_web(query: str) -> dict | None:
             return {"organic": []}
 
 
-async def fetch_url():
+async def fetch_url(url: str):
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.get(SERPER_URL, timeout=30.0)
+            response = await client.get(url=url, timeout=30.0)
             soup = BeautifulSoup(response.text, "html.parser")
             text = soup.get_text()
             return text
@@ -47,8 +47,33 @@ async def fetch_url():
             return "Timeout error"
 
 
-def get_docs():
-    pass
+@mcp.tool()
+async def get_docs(query: str, library: str):
+    """
+    Search the docs for a given query and library.
+    Supports langchain, openai and llama-index.
+
+    Args:
+        query: The query to search for (e.g. "Chroma DB")
+        library: The library to seach in (e.g. "langchain")
+
+    Returns:
+        Text from the docs
+    """
+
+    if library not in docs_url:
+        raise ValueError(f"Library {library} not supported by this tool")
+
+    query = f"site:{docs_url[library]} {query}"
+    results = await search_web(query)
+    if len(results["organic"]) == 0:
+        return "No results found"
+
+    text = ""
+    for result in results["organic"]:
+        text += await fetch_url(result["link"])
+
+    return text
 
 
 def main():
