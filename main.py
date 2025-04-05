@@ -1,5 +1,8 @@
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
+import json
+import os
+import httpx
 
 load_dotenv()
 
@@ -15,15 +18,27 @@ docs_url = {
 }
 
 
-def search_web():
-    pass
+async def search_web(query: str) -> dict | None:
+    payload = json.dumps({"q": query, "num": 2})
+
+    headers = {
+        "X-API-KEY": os.getenv("SERPER_API_KEY"),
+        "Content-Type": "application/json"
+    }
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(SERVER_URL, headers=headers, data=payload, timeout=30.0)
+            response.raise_for_status()
+            return response.json
+        except httpx.TimeoutException:
+            return {"organic": []}
 
 
 def fetch_url():
     pass
 
 
-@mcp.tool
 def get_docs():
     pass
 
