@@ -11,7 +11,7 @@ A Model Context Protocol (MCP) server implementation that can retieve the latest
 
 ## Debug
 
-- Run usin Model Context Protocol inspector.
+- Run usin Model Context Protocol inspector: `npx @modelcontextprotocol/inspector python main.py`
 - Visit the local inspector url displayed on terminal.
 - List the available tools and use `get_docs` to input queries.
 
